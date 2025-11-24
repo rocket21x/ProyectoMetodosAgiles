@@ -2,7 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
-//import userRoutes from './routes/userRoutes.js';
+//import businessRoutes from './routes/businessRoutes.js';
 
 const app = express();
 
@@ -25,7 +25,7 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
 // Routes
-// app.use('/api/users', userRoutes);
+// app.use('/api/business', businessRoute);
 
 // Health Check
 app.get('/health', (req, res) => {
