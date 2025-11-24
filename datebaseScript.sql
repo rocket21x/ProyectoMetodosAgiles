@@ -14,14 +14,16 @@ CREATE TABLE users (
     avatar_url VARCHAR(500)
 );
 
--- Tabla PROVIDER
-CREATE TABLE providers (
+-- Tabla BUSINESS (anteriormente PROVIDER)
+CREATE TABLE businesses (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
     user_id BIGINT NOT NULL,
     business_name VARCHAR(255) NOT NULL,
-    description TEXT,
-    bank_clabe VARCHAR(18),
+    email VARCHAR(255),
+    phone VARCHAR(20),
     logo_image JSON,
+    active_state ENUM('active', 'inactive') NOT NULL,
+    bank_clabe VARCHAR(18),
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
@@ -36,14 +38,14 @@ CREATE TABLE customers (
 -- Tabla EXPERIENCE
 CREATE TABLE experiences (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
-    provider_id BIGINT NOT NULL,
+    business_id BIGINT NOT NULL,
     title VARCHAR(255) NOT NULL,
     description TEXT NOT NULL,
     price_per_person DECIMAL(10,2) NOT NULL,
     location VARCHAR(500) NOT NULL,
     meeting_point VARCHAR(500),
     images JSON,
-    FOREIGN KEY (provider_id) REFERENCES providers(id) ON DELETE CASCADE
+    FOREIGN KEY (business_id) REFERENCES businesses(id) ON DELETE CASCADE
 );
 
 -- Tabla BOOKING
