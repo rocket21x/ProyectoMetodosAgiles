@@ -1,0 +1,5 @@
+Backend/Services/UserService/.env
+/Backend/Services/UserService/node_modules
+Backend/Services/BusinessService/.env
+/Backend/Services/BusinessService/node_modules
+.DS_Store
