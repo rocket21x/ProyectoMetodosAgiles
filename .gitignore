@@ -3,3 +3,5 @@ Backend/Services/UserService/.env
 Backend/Services/BusinessService/.env
 /Backend/Services/BusinessService/node_modules
 .DS_Store
+Backend/Gateways/ApiGateway/.env
+/Backend/Gateways/ApiGateway/node_modules

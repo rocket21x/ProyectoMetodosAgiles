@@ -12,11 +12,10 @@ export const businessDAO = {
           phone,
           logo_image,
           active_state,
-          bank_clabe,
-          created_at
+          bank_clabe
          FROM businesses 
          WHERE user_id = ? 
-         ORDER BY created_at DESC`,
+         ORDER BY id DESC`,
         [userId]
       );
       return rows;
@@ -55,8 +54,7 @@ export const businessDAO = {
           phone,
           logo_image,
           active_state,
-          bank_clabe,
-          created_at
+          bank_clabe
          FROM businesses 
          WHERE id = ?`,
         [result.insertId]
@@ -71,6 +69,19 @@ export const businessDAO = {
       }
       
       throw new Error('Error al crear el negocio');
+    }
+  },
+
+  // Actualizar logo del negocio
+  updateLogo: async (businessId, logoPath) => {
+    try {
+      await pool.execute(
+        'UPDATE businesses SET logo_image = ? WHERE id = ?',
+        [JSON.stringify({ url: logoPath }), businessId]
+      );
+    } catch (error) {
+      console.error('Error en businessDAO.updateLogo:', error);
+      throw new Error('Error al actualizar logo del negocio');
     }
   },
 

@@ -25,8 +25,7 @@ export const businessService = {
         phone: business.phone,
         logo_image: business.logo_image,
         active_state: business.active_state,
-        bank_clabe: business.bank_clabe ? '••••' + business.bank_clabe.slice(-4) : null,
-        created_at: business.created_at
+        bank_clabe: business.bank_clabe ? '••••' + business.bank_clabe.slice(-4) : null
       }));
     } catch (error) {
       console.error('BusinessService - getUserBusinesses error:', error);
@@ -113,7 +112,6 @@ export const businessService = {
         logo_image: newBusiness.logo_image,
         active_state: newBusiness.active_state,
         bank_clabe: newBusiness.bank_clabe ? '••••' + newBusiness.bank_clabe.slice(-4) : null,
-        created_at: newBusiness.created_at,
         message: 'Negocio creado exitosamente'
       };
     } catch (error) {
