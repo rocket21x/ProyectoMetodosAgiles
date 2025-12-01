@@ -2,6 +2,7 @@ import Joi from 'joi';
 
 /**
  * Validación para registro de usuario
+ * No se permite elegir rol - siempre será 'customer'
  */
 export const validateRegister = (req, res, next) => {
   const schema = Joi.object({
@@ -22,12 +23,6 @@ export const validateRegister = (req, res, next) => {
         'string.max': 'La contraseña no puede exceder 100 caracteres',
         'any.required': 'La contraseña es requerida',
         'string.empty': 'La contraseña es requerida'
-      }),
-    role: Joi.string()
-      .valid('customer', 'provider', 'admin')
-      .default('customer')
-      .messages({
-        'any.only': 'El rol debe ser customer, provider o admin'
       }),
     first_name: Joi.string()
       .min(2)

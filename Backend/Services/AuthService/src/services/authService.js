@@ -13,9 +13,10 @@ const JWT_REFRESH_EXPIRES_IN = process.env.JWT_REFRESH_EXPIRES_IN || '30d';
 export const authService = {
   /**
    * Registrar nuevo usuario
+   * SIEMPRE se registra como 'customer', el rol cambia a 'provider' al crear un negocio
    */
   register: async (userData) => {
-    const { email, password, role, first_name, last_name, phone } = userData;
+    const { email, password, first_name, last_name, phone } = userData;
 
     // Verificar si el email ya existe
     const existingUser = await userDAO.findByEmail(email);
@@ -23,22 +24,15 @@ export const authService = {
       throw { status: 409, message: 'El email ya está registrado' };
     }
 
-    // Validar rol
-    const validRoles = ['customer', 'provider', 'admin'];
-    const userRole = role || 'customer';
-    if (!validRoles.includes(userRole)) {
-      throw { status: 400, message: 'Rol inválido' };
-    }
-
     // Hash de la contraseña
     const salt = await bcrypt.genSalt(12);
     const password_hash = await bcrypt.hash(password, salt);
 
-    // Crear usuario
+    // Crear usuario SIEMPRE como customer
     const newUser = await userDAO.create({
       email,
       password_hash,
-      role: userRole,
+      role: 'customer', // Siempre customer al registrar
       first_name,
       last_name,
       phone: phone || null
@@ -57,19 +51,16 @@ export const authService = {
    * Iniciar sesión
    */
   login: async (email, password) => {
-    // Buscar usuario por email
     const user = await userDAO.findByEmail(email);
     if (!user) {
       throw { status: 401, message: 'Credenciales inválidas' };
     }
 
-    // Verificar contraseña
     const isValidPassword = await bcrypt.compare(password, user.password_hash);
     if (!isValidPassword) {
       throw { status: 401, message: 'Credenciales inválidas' };
     }
 
-    // Generar tokens
     const tokens = generateTokens(user);
 
     return {
@@ -84,15 +75,23 @@ export const authService = {
   verifyAccessToken: async (token) => {
     try {
       const decoded = jwt.verify(token, JWT_SECRET);
+      
+      // Obtener el rol actual del usuario (puede haber cambiado)
+      const user = await userDAO.findById(decoded.userId);
+      if (!user) {
+        throw { status: 401, message: 'Usuario no encontrado' };
+      }
+      
       return {
-        userId: decoded.userId,
-        email: decoded.email,
-        role: decoded.role
+        userId: user.id,
+        email: user.email,
+        role: user.role // Rol actual de la BD
       };
     } catch (error) {
       if (error.name === 'TokenExpiredError') {
         throw { status: 401, message: 'Token expirado' };
       }
+      if (error.status) throw error;
       throw { status: 401, message: 'Token inválido' };
     }
   },
@@ -102,16 +101,14 @@ export const authService = {
    */
   refreshAccessToken: async (refreshToken) => {
     try {
-      // Verificar refresh token
       const decoded = jwt.verify(refreshToken, JWT_REFRESH_SECRET);
       
-      // Verificar que el usuario aún existe
       const user = await userDAO.findById(decoded.userId);
       if (!user) {
         throw { status: 401, message: 'Usuario no encontrado' };
       }
 
-      // Generar nuevo access token
+      // Generar nuevo token con el rol ACTUAL
       const accessToken = jwt.sign(
         {
           userId: user.id,

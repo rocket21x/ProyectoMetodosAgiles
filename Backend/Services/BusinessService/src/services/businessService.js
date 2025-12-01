@@ -6,18 +6,23 @@ export const businessService = {
   // Obtener todos los negocios de un usuario
   getUserBusinesses: async (userId) => {
     try {
-      // Verificar que el usuario existe y es proveedor/admin
-      const user = await userDAO.findProviderById(userId);
+      // Verificar que el usuario existe
+      const user = await userDAO.findById(userId);
       if (!user) {
         throw {
-          status: 403,
-          message: 'Usuario no autorizado para gestionar negocios'
+          status: 404,
+          message: 'Usuario no encontrado'
         };
+      }
+
+      // Solo providers y admins pueden tener negocios
+      if (user.role !== 'provider' && user.role !== 'admin') {
+        // Retornar lista vacía si es customer
+        return [];
       }
 
       const businesses = await businessDAO.findByUserId(userId);
       
-      // Formatear la respuesta para el frontend
       return businesses.map(business => ({
         id: business.id,
         business_name: business.business_name,
@@ -36,18 +41,18 @@ export const businessService = {
   // Crear un nuevo negocio
   createBusiness: async (businessData, userId, logoFile = null) => {
     try {
-      // Validar que el usuario existe y es proveedor/admin
-      const user = await userDAO.findProviderById(userId);
+      // Verificar que el usuario existe
+      const user = await userDAO.findById(userId);
       if (!user) {
         throw {
-          status: 403,
-          message: 'Usuario no autorizado para crear negocios'
+          status: 404,
+          message: 'Usuario no encontrado'
         };
       }
 
-      // Verificar límite de negocios (opcional, para futuro)
+      // Verificar límite de negocios
       const businessCount = await userDAO.countUserBusinesses(userId);
-      if (businessCount >= 10) { // Límite de 10 negocios por usuario
+      if (businessCount >= 10) {
         throw {
           status: 400,
           message: 'Has alcanzado el límite máximo de negocios permitidos'
@@ -64,20 +69,21 @@ export const businessService = {
       }
 
       // Validar que el email del negocio no esté duplicado para este usuario
-      const emailExists = await businessDAO.isBusinessEmailTaken(userId, businessData.email);
-      if (emailExists) {
-        throw {
-          status: 409,
-          message: 'Ya tienes un negocio con ese email'
-        };
+      if (businessData.email) {
+        const emailExists = await businessDAO.isBusinessEmailTaken(userId, businessData.email);
+        if (emailExists) {
+          throw {
+            status: 409,
+            message: 'Ya tienes un negocio con ese email'
+          };
+        }
       }
 
       // Procesar imagen del logo si se proporciona
       let logoImagePath = null;
       if (logoFile) {
         fileUpload.validateImageFile(logoFile);
-        // Nota: La ruta real se asignará después de crear el negocio
-        logoImagePath = '/uploads/business-logos/placeholder'; // Temporal
+        logoImagePath = '/uploads/business-logos/placeholder';
       }
 
       // Preparar datos para crear el negocio
@@ -87,7 +93,7 @@ export const businessService = {
         email: businessData.email,
         phone: businessData.phone,
         logo_image: logoImagePath,
-        active_state: businessData.active_state,
+        active_state: businessData.active_state || 'active',
         bank_clabe: businessData.bank_clabe || null
       };
 
@@ -97,13 +103,16 @@ export const businessService = {
       // Si hay imagen, guardarla con el ID real del negocio
       if (logoFile && newBusiness.id) {
         const actualLogoPath = await fileUpload.saveBusinessLogo(logoFile, newBusiness.id);
-        
-        // Actualizar el negocio con la ruta real de la imagen
         await businessDAO.updateLogo(newBusiness.id, actualLogoPath);
         newBusiness.logo_image = actualLogoPath;
       }
 
-      // Formatear respuesta
+      // *** IMPORTANTE: Cambiar rol de customer a provider ***
+      if (user.role === 'customer') {
+        await userDAO.upgradeToProvider(userId);
+        console.log(`Usuario ${userId} actualizado a provider`);
+      }
+
       return {
         id: newBusiness.id,
         business_name: newBusiness.business_name,
@@ -112,7 +121,9 @@ export const businessService = {
         logo_image: newBusiness.logo_image,
         active_state: newBusiness.active_state,
         bank_clabe: newBusiness.bank_clabe ? '••••' + newBusiness.bank_clabe.slice(-4) : null,
-        message: 'Negocio creado exitosamente'
+        message: 'Negocio creado exitosamente',
+        // Indicar que el rol cambió
+        roleUpgraded: user.role === 'customer'
       };
     } catch (error) {
       console.error('BusinessService - createBusiness error:', error);
@@ -120,11 +131,10 @@ export const businessService = {
     }
   },
 
-  // Validar datos del negocio (para uso interno)
+  // Validar datos del negocio
   validateBusinessData: (businessData) => {
     const errors = [];
 
-    // Validar nombre del negocio
     if (!businessData.business_name || businessData.business_name.trim().length < 2) {
       errors.push('El nombre del negocio debe tener al menos 2 caracteres');
     }
@@ -133,24 +143,22 @@ export const businessService = {
       errors.push('El nombre del negocio no puede exceder 255 caracteres');
     }
 
-    // Validar email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!businessData.email || !emailRegex.test(businessData.email)) {
+    if (businessData.email && !emailRegex.test(businessData.email)) {
       errors.push('El email del negocio no es válido');
     }
 
-    // Validar teléfono (formato básico)
-    const phoneRegex = /^[\+]?[0-9\s\-\(\)]{10,}$/;
-    if (!businessData.phone || !phoneRegex.test(businessData.phone.replace(/\s/g, ''))) {
-      errors.push('El teléfono del negocio no es válido');
+    if (businessData.phone) {
+      const phoneRegex = /^[\+]?[0-9\s\-\(\)]{10,}$/;
+      if (!phoneRegex.test(businessData.phone.replace(/\s/g, ''))) {
+        errors.push('El teléfono del negocio no es válido');
+      }
     }
 
-    // Validar estado
-    if (!businessData.active_state || !['active', 'inactive'].includes(businessData.active_state)) {
+    if (businessData.active_state && !['active', 'inactive'].includes(businessData.active_state)) {
       errors.push('El estado del negocio debe ser "active" o "inactive"');
     }
 
-    // Validar CLABE (si se proporciona)
     if (businessData.bank_clabe && businessData.bank_clabe.length !== 18) {
       errors.push('La CLABE bancaria debe tener 18 dígitos');
     }
