@@ -21,7 +21,12 @@ export const proxyToService = (serviceUrl, path) => {
         'Content-Type': 'application/json'
       };
 
-      // Pasar información del usuario autenticado
+      // IMPORTANTE: Pasar el header Authorization si existe
+      if (req.headers.authorization) {
+        headers['Authorization'] = req.headers.authorization;
+      }
+
+      // Pasar información del usuario autenticado (para servicios internos)
       if (req.userId) {
         headers['x-user-id'] = req.userId.toString();
       }
@@ -36,7 +41,7 @@ export const proxyToService = (serviceUrl, path) => {
         url,
         headers,
         params: req.query,
-        timeout: 30000 // 30 segundos timeout
+        timeout: 30000
       };
 
       // Agregar body si no es GET
@@ -65,7 +70,6 @@ const handleProxyError = (error, serviceUrl, path, res) => {
   console.error(`  ✗ Proxy error to ${serviceUrl}${path}:`, error.message);
   
   if (error.response) {
-    // El servicio respondió con error
     return res.status(error.response.status).json(error.response.data);
   }
   
@@ -104,6 +108,12 @@ export const proxyWithTransform = (serviceUrl, path, transformFn) => {
       const url = `${serviceUrl}${finalPath}`;
       
       const headers = { 'Content-Type': 'application/json' };
+      
+      // Pasar Authorization
+      if (req.headers.authorization) {
+        headers['Authorization'] = req.headers.authorization;
+      }
+      
       if (req.userId) headers['x-user-id'] = req.userId.toString();
       if (req.user) {
         headers['x-user-role'] = req.user.role;
@@ -123,8 +133,6 @@ export const proxyWithTransform = (serviceUrl, path, transformFn) => {
       }
 
       const response = await axios(config);
-      
-      // Aplicar transformación si existe
       const transformedData = transformFn ? transformFn(response.data) : response.data;
       
       res.status(response.status).json(transformedData);
