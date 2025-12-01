@@ -1,5 +1,5 @@
 import BusinessList from "./pages/BusinessList"
-import BusinessCreate from "./pages/BusinessCreate"
+import BusinessCreate from "./pages/CreateBusiness"
 import ExperienceCreate from "./pages/ExperienceCreate"
 import "./App.css"
 
