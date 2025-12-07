@@ -2,6 +2,7 @@
 
 # Jonatan Josue Castelo Peraza 00000107624
 # Asiel Apodaca Monge 00000247722
+# Oribiel Beltran Arredondo 00000228452
 
 # Arquitectura Preliminar y Modelo ER: https://drive.google.com/drive/folders/1y4s62LOIn1mHkf8gMJuZGyfX1ohs6VC8?usp=sharing
 
