@@ -8,6 +8,112 @@
   </head>
   <body>
     <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
+    <script type="module" src="./src/main.jsx"></script>
   </body>
+</html>
+
+
+<!--Pagina de Inicio de Sesion--> 
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Localify - Inicio de Sesión</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f2f2f2;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            display: flex;
+            justify-content: space-between;
+            padding: 20px;
+            background: white;
+            border-bottom: 1px solid #ddd;
+        }
+        header h2 {
+            margin: 0;
+        }
+        nav a {
+            margin-left: 20px;
+            text-decoration: none;
+            color: black;
+        }
+        .container {
+            width: 40%;
+            margin: 70px auto;
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            margin-top: 5px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+        }
+        button {
+            padding: 10px 20px;
+            background: #3366FF;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #1f4ed6;
+        }
+        .register-box {
+            margin-top: 30px;
+            padding: 20px;
+            border: 1px dashed #ccc;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h2>Localify</h2>
+    <nav>
+        <a href="#">Página Inicio</a>
+        <a href="#">Acerca de</a>
+    </nav>
+</header>
+
+<div class="container">
+
+    <h2>Inicio de Sesión</h2>
+
+    <label>Correo electrónico:</label>
+    <input type="email" placeholder="Ingrese su correo" id="email">
+
+    <label>Contraseña:</label>
+    <input type="password" placeholder="Ingrese su contraseña" id="password">
+
+    <button onclick="loginUser()">Iniciar Sesión</button>
+
+    <div class="register-box">
+        <p>¿No estás registrado? Regístrate aquí:</p>
+        <a href="register.html"><button>Crear cuenta</button></a>
+    </div>
+
+</div>
+
+<script>
+    function loginUser() {
+        alert("Aquí conectarás el login con tu backend.");
+    }
+</script>
+
+</body>
 </html>
