@@ -10,9 +10,9 @@ export default function Header() {
         </div>
         <nav className="header-nav">
           <a href="#" className="nav-link">Mis negocios</a>
-          <a href="#" className="nav-link">Perlas</a>
-          <a href="#" className="nav-link">Negras</a>
-          <a href="#" className="nav-link">Con redbull</a>
+          <a href="#" className="nav-link">Mis experiencias</a>
+          <a href="#" className="nav-link">Pagos</a>
+          <a href="#" className="nav-link">Acerca de nosotros</a>
         </nav>
       </div>
     </header>
