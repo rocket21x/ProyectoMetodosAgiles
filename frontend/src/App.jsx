@@ -1,22 +1,43 @@
-import BusinessList from "./pages/BusinessList"
-import BusinessCreate from "./pages/CreateBusiness"
-import ExperienceCreate from "./pages/ExperienceCreate"
-import "./App.css"
+import { Routes, Route, Navigate } from 'react-router-dom'
+import Header from './components/Header'
+// import Login from './pages/Login'
+// import Register from './pages/Register' 
+import BusinessList from './pages/BusinessList'
+import BusinessCreate from './pages/BusinessCreate'
+import ExperienceCreate from './pages/ExperienceCreate'
+import './App.css'
 
 function App() {
-  const pathname = window.location.pathname
+  const token = localStorage.getItem('accessToken')
 
-  // Routing manual según URL
-  if (pathname === "/registrar-negocio") {
-    return <BusinessCreate />
-  }
+  // Rutas públicas
+  const publicRoutes = (
+    <>
+      {/* <Route path="/login" element={<Login />} />
+      <Route path="/registro" element={<Register />} /> */}
+    </>
+  )
 
-  if (pathname === "/experiencia") {
-    return <ExperienceCreate />
-  }
+  // Rutas protegidas
+  const protectedRoutes = (
+    <>
+      <Route path="/" element={<BusinessList />} />
+      <Route path="/negocios" element={<BusinessList />} />
+      <Route path="/registrar-negocio" element={<BusinessCreate />} />
+      <Route path="/experiencia/crear" element={<ExperienceCreate />} />
+    </>
+  )
 
-  // Página por defecto
-  return <BusinessList />
+  return (
+    <div className="app">
+      {token && <Header />}
+      <Routes>
+        {publicRoutes}
+        {token ? protectedRoutes : <Route path="*" element={<Navigate to="/login" replace />} />}
+        {!token && <Route path="*" element={<Navigate to="/login" replace />} />}
+      </Routes>
+    </div>
+  )
 }
 
 export default App
