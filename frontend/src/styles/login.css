@@ -5,6 +5,11 @@
   justify-content: center;
   background-color: #f5f5f5;
   padding: 20px;
+  transition: background-color 0.3s ease;
+}
+
+.login-page:has(.login-btn:hover) {
+  animation: bg-rainbow 4s linear infinite;
 }
 
 .login-container {
@@ -88,6 +93,11 @@
     animation: none;
     background: #0041c9;
   }
+
+  .login-page:has(.login-btn:hover) {
+    animation: none;
+    background-color: #f5f5f5;
+  }
 }
 
 .login-btn:disabled {
@@ -105,6 +115,17 @@
   71%  { background: hsl(240, 55%, 50%); }
   85%  { background: hsl(300, 55%, 45%); }
   100% { background: hsl(360, 55%, 45%); }
+}
+
+@keyframes bg-rainbow {
+  0%   { background-color: hsl(0, 55%, 94%); }
+  14%  { background-color: hsl(30, 55%, 93%); }
+  28%  { background-color: hsl(60, 55%, 91%); }
+  42%  { background-color: hsl(150, 55%, 91%); }
+  57%  { background-color: hsl(200, 55%, 92%); }
+  71%  { background-color: hsl(240, 55%, 93%); }
+  85%  { background-color: hsl(300, 55%, 92%); }
+  100% { background-color: hsl(360, 55%, 94%); }
 }
 
 .error-message {
