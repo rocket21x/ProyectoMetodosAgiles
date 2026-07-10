@@ -7,17 +7,17 @@ class ApiClient {
 
   // Get JWT token from localStorage
   getToken() {
-    return localStorage.getItem("jwt_token")
+    return localStorage.getItem("accessToken")
   }
 
   // Set JWT token in localStorage
   setToken(token) {
-    localStorage.setItem("jwt_token", token)
+    localStorage.setItem("accessToken", token)
   }
 
   // Remove JWT token from localStorage
   removeToken() {
-    localStorage.removeItem("jwt_token")
+    localStorage.removeItem("accessToken")
   }
 
   // Build headers with JWT token
