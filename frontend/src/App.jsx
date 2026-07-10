@@ -1,9 +1,9 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
 import Header from './components/Header'
-// import Login from './pages/Login'
+import Login from './pages/Login'
 // import Register from './pages/Register' 
 import BusinessList from './pages/BusinessList'
-import BusinessCreate from './pages/BusinessCreate'
+import BusinessCreate from './pages/CreateBusiness'
 import ExperienceCreate from './pages/ExperienceCreate'
 import './App.css'
 
@@ -13,8 +13,8 @@ function App() {
   // Rutas públicas
   const publicRoutes = (
     <>
-      {/* <Route path="/login" element={<Login />} />
-      <Route path="/registro" element={<Register />} /> */}
+      <Route path="/login" element={<Login />} />
+      {/* <Route path="/registro" element={<Register />} /> */}
     </>
   )
 
@@ -34,7 +34,6 @@ function App() {
       <Routes>
         {publicRoutes}
         {token ? protectedRoutes : <Route path="*" element={<Navigate to="/login" replace />} />}
-        {!token && <Route path="*" element={<Navigate to="/login" replace />} />}
       </Routes>
     </div>
   )
